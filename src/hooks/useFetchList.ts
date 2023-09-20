@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig } from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 
 interface FetchListResult<T> {
   data: T | null;
@@ -12,7 +12,7 @@ const useFetchList = <T>(options: AxiosRequestConfig): FetchListResult<T> => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);
 
-  function fetchData() {
+  const fetchData = useCallback(() => {
     setLoading(true);
     axios(options)
       .then((response) => {
@@ -25,12 +25,12 @@ const useFetchList = <T>(options: AxiosRequestConfig): FetchListResult<T> => {
       .finally(() => {
         setLoading(false);
       });
-  }
+  }, [options]);
 
   useEffect(() => {
     fetchData();
     // eslint-disable-next-line
-  }, [options.url]);
+  }, []);
 
   return { data, loading, error };
 };

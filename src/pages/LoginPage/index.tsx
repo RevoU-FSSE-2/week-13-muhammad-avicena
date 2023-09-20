@@ -6,8 +6,8 @@ import Swal from 'sweetalert2';
 import * as Yup from 'yup';
 
 const validationSchema = Yup.object().shape({
-    email: Yup.string().email('Invalid email').required('Email is required'), // Set custom error message for required
-    password: Yup.string().required('Password is required'), // Set custom error message for required
+    email: Yup.string().email('Invalid email').required('Email is required'), 
+    password: Yup.string().required('Password is required'), 
 });
 
 const initialValues = {
