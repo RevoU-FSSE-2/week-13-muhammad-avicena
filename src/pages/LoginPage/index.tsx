@@ -33,6 +33,13 @@ const LoginForm: React.FC = () => {
                 icon: 'success',
                 title: 'Login Successful',
                 text: 'You have successfully logged in. You will be redirected to dashboard shortly...',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '/dashboard';
+                }
+                setInterval(() => {
+                    window.location.href = '/dashboard';
+                }, 3000);
             });
         }).catch((error) => {
             console.log(error);
