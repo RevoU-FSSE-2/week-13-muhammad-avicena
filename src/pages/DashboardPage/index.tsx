@@ -116,7 +116,7 @@ const DashboardPage: React.FC = () => {
                     title: 'Delete Successful',
                     text: 'You have successfully deleted the category.',
                 })
-                // navigate('/dashboard');
+                navigate('/dashboard');
             }).catch((error) => {
                 console.log(error);
                 Swal.fire({
