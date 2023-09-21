@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom'
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import { useFetchList } from '../../hooks';
@@ -11,25 +12,21 @@ interface Category {
     is_active: boolean;
 }
 
-interface AddCategory {
-    name: string;
-    is_active: boolean;
-}
-
 interface DataProfile {
     name: string;
     email: string;
 }
 
 const DashboardPage: React.FC = () => {
-    const [addModalOpen, setAddModalOpen] = useState(false);
-    const [addedRow, setAddedRow] = useState<AddCategory | null>({ name: '', is_active: false });
+    const [addModalOpen, setAddModalOpen] = useState<boolean>(false);
+    const [addedRow, setAddedRow] = useState<Category | null>(null);
     const [editModalOpen, setEditModalOpen] = useState(false);
     const [editedRow, setEditedRow] = useState<Category | null>(null);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [rowToDelete, setRowToDelete] = useState<Category | null>(null);
 
     const validate = sessionStorage.getItem('userToken');
+    const navigate = useNavigate();
 
     const { data, loading, error } = useFetchList<Category[]>({
         url: 'https://mock-api.arikmpt.com/api/category',
@@ -77,7 +74,7 @@ const DashboardPage: React.FC = () => {
     };
 
     const handleAddCategory = () => {
-        console.log(addedRow, "isi added row")
+
         axios.post('https://mock-api.arikmpt.com/api/category/create', {
             name: addedRow?.name,
             is_active: addedRow?.is_active,
@@ -91,10 +88,10 @@ const DashboardPage: React.FC = () => {
                     text: 'You have successfully added a new category.',
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        window.location.href = '/dashboard';
+                        navigate('/dashboard')
                     }
                     setInterval(() => {
-                        window.location.href = '/dashboard';
+                        navigate('/dashboard')
                     }, 3000);
                 });
             }).catch((error) => {
@@ -119,6 +116,7 @@ const DashboardPage: React.FC = () => {
                     title: 'Delete Successful',
                     text: 'You have successfully deleted the category.',
                 })
+                // navigate('/dashboard');
             }).catch((error) => {
                 console.log(error);
                 Swal.fire({
@@ -145,10 +143,10 @@ const DashboardPage: React.FC = () => {
                     text: 'You have successfully updated the category.',
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        window.location.href = '/dashboard';
+                        navigate('/dashboard');
                     }
                     setInterval(() => {
-                        window.location.href = '/dashboard';
+                        navigate('/dashboard');
                     }, 3000);
                 });
             }).catch((error) => {
@@ -173,7 +171,7 @@ const DashboardPage: React.FC = () => {
         {
             field: 'actions',
             headerName: 'Actions',
-            width: 150,
+            width: 180,
             sortable: false,
             filterable: false,
             renderCell: (params) => (
@@ -193,6 +191,7 @@ const DashboardPage: React.FC = () => {
                         variant="contained"
                         color="error"
                         size="small"
+                        style={{ marginLeft: 10 }}
                         onClick={(e) => {
                             e.stopPropagation();
                             handleDeleteData(params.row);
@@ -214,13 +213,12 @@ const DashboardPage: React.FC = () => {
     }
 
     if (!validate) {
-        window.location.href = '/';
+        navigate('/');
     }
 
-    // Handle logout
     const handleLogout = () => {
         sessionStorage.removeItem('userToken');
-        window.location.href = '/';
+        navigate('/');
     };
 
     return (

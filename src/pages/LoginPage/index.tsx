@@ -1,13 +1,14 @@
 import React from 'react';
 import { TextField, Button, Grid, Typography, Paper, Link } from '@mui/material';
 import { Formik, Form, Field } from 'formik';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import * as Yup from 'yup';
 
 const validationSchema = Yup.object().shape({
-    email: Yup.string().email('Invalid email').required('Email is required'), 
-    password: Yup.string().required('Password is required'), 
+    email: Yup.string().email('Invalid email').required('Email is required'),
+    password: Yup.string().required('Password is required'),
 });
 
 const initialValues = {
@@ -22,6 +23,8 @@ interface FormValues {
 
 const LoginForm: React.FC = () => {
 
+    const navigate = useNavigate();
+
     const handleSubmit = (values: FormValues) => {
         axios.post('https://mock-api.arikmpt.com/api/user/login', {
             email: values.email,
@@ -35,10 +38,10 @@ const LoginForm: React.FC = () => {
                 text: 'You have successfully logged in. You will be redirected to dashboard shortly...',
             }).then((result) => {
                 if (result.isConfirmed) {
-                    window.location.href = '/dashboard';
+                    navigate('/dashboard');
                 }
                 setInterval(() => {
-                    window.location.href = '/dashboard';
+                    navigate('/dashboard');
                 }, 3000);
             });
         }).catch((error) => {
@@ -92,12 +95,19 @@ const LoginForm: React.FC = () => {
                                 <Button type="submit" variant="contained" color="primary" style={{ marginTop: "10px" }} fullWidth>
                                     Log In
                                 </Button>
-                                <Typography variant="body2" gutterBottom style={{ marginTop: "10px" }}>
-                                    If you don't have an account yet, <Link href="/register">Register here</Link>.
-                                </Typography>
+
                             </Form>
                         )}
                     </Formik>
+                    <Typography variant="body2" gutterBottom style={{ marginTop: "10px" }}>
+                        If you don't have an account yet, <Link
+                            component="button"
+                            variant="body2"
+                            onClick={() => navigate('/register')}
+                        >
+                            Register here
+                        </Link>.
+                    </Typography>
                 </Paper>
             </Grid>
         </Grid>

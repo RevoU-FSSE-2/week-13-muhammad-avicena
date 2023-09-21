@@ -1,6 +1,7 @@
 import React from 'react';
 import { TextField, Button, Grid, Typography, Paper, Link } from '@mui/material';
 import { Formik, Form, Field } from 'formik';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import * as Yup from 'yup';
@@ -29,6 +30,8 @@ interface FormValues {
 
 const RegistrationForm: React.FC = () => {
 
+    const navigate = useNavigate();
+
 
     const handleSubmit = (values: FormValues) => {
         axios
@@ -45,10 +48,10 @@ const RegistrationForm: React.FC = () => {
                     text: 'You have successfully registered. You can now log in.',
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        window.location.href = '/';
+                        navigate('/');
                     }
                     setInterval(() => {
-                        window.location.href = '/';
+                        navigate('/');
                     }, 3000);
                 });
             })
@@ -108,12 +111,21 @@ const RegistrationForm: React.FC = () => {
                                 <Button type="submit" variant="contained" color="primary" fullWidth>
                                     Register
                                 </Button>
-                                <Typography variant="body2" gutterBottom style={{ marginTop: "10px" }}>
-                                    If you already have an account, <Link href="/">Login here</Link>.
-                                </Typography>
+
                             </Form>
                         )}
                     </Formik>
+                    <Typography variant="body2" gutterBottom style={{ marginTop: "10px" }}>
+                        If you already have an account,
+                        <Link
+                            component="button"
+                            variant="body2"
+                            style={{ marginLeft: "5px" }}
+                            onClick={() => navigate('/')}
+                        >
+                            Login here
+                        </Link>.
+                    </Typography>
                 </Paper>
             </Grid>
         </Grid>
