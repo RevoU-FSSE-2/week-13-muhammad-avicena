@@ -28,6 +28,10 @@ const DashboardPage: React.FC = () => {
     const validate = sessionStorage.getItem('userToken');
     const navigate = useNavigate();
 
+    if(!validate) {
+        navigate('/');
+    }
+
     const { data, loading, error } = useFetchList<Category[]>({
         url: 'https://mock-api.arikmpt.com/api/category',
         method: 'GET',
@@ -166,6 +170,7 @@ const DashboardPage: React.FC = () => {
             field: 'is_status',
             headerName: 'Status',
             width: 130,
+            filterable: false,
             renderCell: (params) => (<div>{params.row.is_active ? 'Active' : 'Deactive'}</div>)
         },
         {
@@ -181,6 +186,7 @@ const DashboardPage: React.FC = () => {
                         color="primary"
                         size="small"
                         onClick={(e) => {
+                            console.log(params.row)
                             e.stopPropagation();
                             handleEditData(params.row)
                         }}

@@ -1,4 +1,4 @@
-import { LoginPage, RegisterPage, DashboardPage } from './pages'
+import { LoginPage, RegisterPage, DashboardPage, NotFoundPage } from './pages'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import './App.css'
 
@@ -16,6 +16,10 @@ function App() {
     {
       path: '/dashboard',
       element: <DashboardPage />
+    },
+    {
+      path: '*',
+      element: <NotFoundPage />
     }
   ])
 
