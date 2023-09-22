@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios';
 import Swal from 'sweetalert2';
@@ -31,6 +31,7 @@ interface DataProfile {
 
 const DashboardPage: React.FC = () => {
     const [addModalOpen, setAddModalOpen] = useState<boolean>(false);
+    const [dataList, setData] = useState<Category[]>([]);
     const [editModalOpen, setEditModalOpen] = useState(false);
     const [editedRow, setEditedRow] = useState<Category | null>(null);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -43,13 +44,34 @@ const DashboardPage: React.FC = () => {
         navigate('/');
     }
 
-    const { data, loading, error } = useFetchList<Category[]>({
+    const { loading, error } = useFetchList<Category[]>({
         url: 'https://mock-api.arikmpt.com/api/category',
         method: 'GET',
         headers: {
             Authorization: `Bearer ${validate}`,
         },
     });
+
+    useEffect(() => {
+        fetchData();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    const fetchData = () => {
+        axios.get('https://mock-api.arikmpt.com/api/category',
+            { headers: { Authorization: `Bearer ${validate}` } })
+            .then((response) => {
+                console.log('Get successful', response.data.data);
+                setData(response.data.data);
+            }).catch((error) => {
+                console.log(error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Get Failed',
+                    text: 'An error occurred during get. Please try again.',
+                });
+            });
+    }
 
     const { data: dataProfile } = useFetchList<DataProfile>({
         url: 'https://mock-api.arikmpt.com/api/user/profile',
@@ -91,7 +113,7 @@ const DashboardPage: React.FC = () => {
 
         console.log("clicked")
 
-        const getDataMap = data?.map((item) => item.name);
+        const getDataMap = dataList?.map((item) => item.name);
         if (getDataMap?.includes(values?.name)) {
             handleCloseAddModal();
             Swal.fire({
@@ -101,7 +123,7 @@ const DashboardPage: React.FC = () => {
             });
             return;
         }
-        
+
         axios.post('https://mock-api.arikmpt.com/api/category/create', {
             name: values?.name,
             is_active: values?.is_active,
@@ -113,14 +135,8 @@ const DashboardPage: React.FC = () => {
                     icon: 'success',
                     title: 'Add Successful',
                     text: 'You have successfully added a new category.',
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        window.location.reload();
-                    }
-                    setInterval(() => {
-                        window.location.reload();
-                    }, 3000);
-                });
+                })
+                fetchData();
             }).catch((error) => {
                 console.log(error);
                 Swal.fire({
@@ -132,7 +148,6 @@ const DashboardPage: React.FC = () => {
     }
 
     const handleDeleteCategory = () => {
-
         axios.delete(`https://mock-api.arikmpt.com/api/category/${rowToDelete?.id}`,
             { headers: { Authorization: `Bearer ${validate}` } })
             .then((response) => {
@@ -143,7 +158,7 @@ const DashboardPage: React.FC = () => {
                     title: 'Delete Successful',
                     text: 'You have successfully deleted the category.',
                 })
-                window.location.reload();
+                fetchData();
             }).catch((error) => {
                 console.log(error);
                 Swal.fire({
@@ -407,9 +422,9 @@ const DashboardPage: React.FC = () => {
 
             {/* Grid table data */}
             <div style={{ height: 400, width: '100%' }}>
-                {data ? (
+                {dataList ? (
                     <DataGrid
-                        rows={data}
+                        rows={dataList}
                         columns={columns}
                         initialState={{
                             pagination: {

@@ -38,10 +38,10 @@ const LoginForm: React.FC = () => {
                 text: 'You have successfully logged in. You will be redirected to dashboard shortly...',
             }).then((result) => {
                 if (result.isConfirmed) {
-                    navigate('/dashboard');
+                    window.location.replace('/dashboard');
                 }
                 setInterval(() => {
-                    navigate('/dashboard');
+                    window.location.replace('/dashboard');
                 }, 3000);
             });
         }).catch((error) => {
