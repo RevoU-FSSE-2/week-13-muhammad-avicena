@@ -28,7 +28,7 @@ const DashboardPage: React.FC = () => {
     const validate = sessionStorage.getItem('userToken');
     const navigate = useNavigate();
 
-    if(!validate) {
+    if (!validate) {
         navigate('/');
     }
 
@@ -376,9 +376,6 @@ const DashboardPage: React.FC = () => {
             </Container>
 
             {/* Grid table data */}
-            <Typography variant="h5" gutterBottom>
-                List of Category
-            </Typography>
             <div style={{ height: 400, width: '100%' }}>
                 {data ? (
                     <DataGrid
@@ -389,6 +386,7 @@ const DashboardPage: React.FC = () => {
                                 paginationModel: { page: 0, pageSize: 5 },
                             },
                         }}
+                        style={{ backgroundColor: '#fff' }}
                         pageSizeOptions={[5, 10]}
                     />
                 ) : (
