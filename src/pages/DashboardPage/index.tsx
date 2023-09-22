@@ -2,9 +2,21 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import { Formik, Form, Field } from 'formik';
+import * as Yup from 'yup';
 import { useFetchList } from '../../hooks';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, MenuItem, Container, Paper, Typography } from '@mui/material';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
+
+const validationSchema = Yup.object().shape({
+    name: Yup.string().required('Name is required'),
+    is_active: Yup.boolean().required('Status is required'),
+});
+
+const initialValuesAdd = {
+    name: '',
+    is_active: true,
+};
 
 interface Category {
     id?: number;
@@ -19,7 +31,6 @@ interface DataProfile {
 
 const DashboardPage: React.FC = () => {
     const [addModalOpen, setAddModalOpen] = useState<boolean>(false);
-    const [addedRow, setAddedRow] = useState<Category | null>(null);
     const [editModalOpen, setEditModalOpen] = useState(false);
     const [editedRow, setEditedRow] = useState<Category | null>(null);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -53,7 +64,6 @@ const DashboardPage: React.FC = () => {
     }
 
     const handleCloseAddModal = () => {
-        setAddedRow(null);
         setAddModalOpen(false);
     }
 
@@ -77,11 +87,24 @@ const DashboardPage: React.FC = () => {
         setDeleteDialogOpen(false);
     };
 
-    const handleAddCategory = () => {
+    const handleAddCategory = (values: Category) => {
 
+        console.log("clicked")
+
+        const getDataMap = data?.map((item) => item.name);
+        if (getDataMap?.includes(values?.name)) {
+            handleCloseAddModal();
+            Swal.fire({
+                icon: 'error',
+                title: 'Add Failed',
+                text: 'Category name already exists. Please try again.',
+            });
+            return;
+        }
+        
         axios.post('https://mock-api.arikmpt.com/api/category/create', {
-            name: addedRow?.name,
-            is_active: addedRow?.is_active,
+            name: values?.name,
+            is_active: values?.is_active,
         }, { headers: { Authorization: `Bearer ${validate}` } })
             .then((response) => {
                 handleCloseAddModal();
@@ -92,10 +115,10 @@ const DashboardPage: React.FC = () => {
                     text: 'You have successfully added a new category.',
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        navigate('/dashboard')
+                        window.location.reload();
                     }
                     setInterval(() => {
-                        navigate('/dashboard')
+                        window.location.reload();
                     }, 3000);
                 });
             }).catch((error) => {
@@ -120,7 +143,7 @@ const DashboardPage: React.FC = () => {
                     title: 'Delete Successful',
                     text: 'You have successfully deleted the category.',
                 })
-                navigate('/dashboard');
+                window.location.reload();
             }).catch((error) => {
                 console.log(error);
                 Swal.fire({
@@ -147,10 +170,10 @@ const DashboardPage: React.FC = () => {
                     text: 'You have successfully updated the category.',
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        navigate('/dashboard');
+                        window.location.reload();
                     }
                     setInterval(() => {
-                        navigate('/dashboard');
+                        window.location.reload();
                     }, 3000);
                 });
             }).catch((error) => {
@@ -230,49 +253,56 @@ const DashboardPage: React.FC = () => {
     return (
         <>
             {/* Add Modal Dialog */}
-            <Dialog open={addModalOpen} onClose={handleCloseAddModal}>
-                <DialogTitle>Add Row</DialogTitle>
-                <DialogContent>
-                    <TextField
-                        label="Name"
-                        style={{ margin: '10px 0' }}
-                        onChange={(e) => {
-                            setAddedRow((prevAddedRow) => ({
-                                name: e.target.value,
-                                is_active: prevAddedRow?.is_active || false,
-                            }));
-                        }}
-                        fullWidth
-                    />
-                    <TextField
-                        label="Status"
-                        select
-                        style={{ margin: '25px 0' }}
-                        onChange={(e) => {
-                            setAddedRow((prevAddedRow) => ({
-                                name: prevAddedRow?.name || '',
-                                is_active: e.target.value === 'active',
-                            }));
-                        }}
-                        fullWidth
-                    >
-                        <MenuItem value="active">Active</MenuItem>
-                        <MenuItem value="deactive">Deactive</MenuItem>
-                    </TextField>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCloseAddModal}>Cancel</Button>
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={() => {
-                            handleAddCategory();
-                        }}
-                    >
-                        Save
-                    </Button>
-                </DialogActions>
-            </Dialog >;
+            <Formik
+                initialValues={initialValuesAdd}
+                validationSchema={validationSchema}
+                onSubmit={handleAddCategory}
+            >
+                {({ touched, errors }) => (
+                    <Dialog open={addModalOpen} onClose={handleCloseAddModal}>
+                        <Form>
+                            <DialogTitle>Add Row</DialogTitle>
+                            <DialogContent>
+                                <Field
+                                    type="text"
+                                    name="name"
+                                    label="Name"
+                                    as={TextField}
+                                    fullWidth
+                                    style={{ margin: '10px 0' }}
+                                    error={touched.name && Boolean(errors.name)}
+                                    helperText={touched.name && errors.name}
+                                />
+
+                                <Field
+                                    type="text"
+                                    name="is_active"
+                                    label="Status"
+                                    as={TextField}
+                                    select
+                                    fullWidth
+                                    error={touched.is_active && Boolean(errors.is_active)}
+                                    helperText={touched.is_active && errors.is_active}
+                                    style={{ margin: '25px 0' }}
+                                >
+                                    <MenuItem value="true">Active</MenuItem>
+                                    <MenuItem value="false">Deactive</MenuItem>
+                                </Field>
+                            </DialogContent>
+                            <DialogActions>
+                                <Button onClick={handleCloseAddModal}>Cancel</Button>
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    type="submit"
+                                >
+                                    Save
+                                </Button>
+                            </DialogActions>
+                        </Form>
+                    </Dialog>
+                )}
+            </Formik >
 
             {/* Edit Modal Dialog */}
             < Dialog open={editModalOpen} onClose={handleCloseEditModal} >
