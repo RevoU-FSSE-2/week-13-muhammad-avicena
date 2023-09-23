@@ -183,14 +183,8 @@ const DashboardPage: React.FC = () => {
                     icon: 'success',
                     title: 'Update Successful',
                     text: 'You have successfully updated the category.',
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        window.location.reload();
-                    }
-                    setInterval(() => {
-                        window.location.reload();
-                    }, 3000);
-                });
+                })
+                fetchData();
             }).catch((error) => {
                 console.log(error);
                 Swal.fire({
@@ -257,12 +251,12 @@ const DashboardPage: React.FC = () => {
     }
 
     if (!validate) {
-        navigate('/');
+        window.location.replace('/');
     }
 
     const handleLogout = () => {
         sessionStorage.removeItem('userToken');
-        navigate('/');
+        window.location.replace('/');
     };
 
     return (

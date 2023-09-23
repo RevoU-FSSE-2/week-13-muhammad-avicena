@@ -36,14 +36,10 @@ const LoginForm: React.FC = () => {
                 icon: 'success',
                 title: 'Login Successful',
                 text: 'You have successfully logged in. You will be redirected to dashboard shortly...',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    navigate('/dashboard')
-                }
-                setInterval(() => {
-                    navigate('/dashboard')
-                }, 3000);
-            });
+            })
+            setInterval(() => {
+                navigate('/dashboard')
+            }, 3000);
         }).catch((error) => {
             console.log(error);
             Swal.fire({

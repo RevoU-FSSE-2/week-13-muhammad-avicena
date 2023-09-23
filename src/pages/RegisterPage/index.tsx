@@ -46,14 +46,10 @@ const RegistrationForm: React.FC = () => {
                     icon: 'success',
                     title: 'Registration Successful',
                     text: 'You have successfully registered. You can now log in.',
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        navigate('/');
-                    }
-                    setInterval(() => {
-                        navigate('/');
-                    }, 3000);
-                });
+                })
+                setInterval(() => {
+                    navigate('/');
+                }, 3000);
             })
             .catch((error) => {
                 console.log(error);
@@ -64,8 +60,6 @@ const RegistrationForm: React.FC = () => {
                 });
             });
     };
-
-
 
     return (
         <Grid container justifyContent="center" alignItems="center" style={{ minHeight: '100vh' }}>
